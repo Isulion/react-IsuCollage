@@ -12,8 +12,7 @@ import {
   CssBaseline
 } from '@mui/material';
 import { PreviewWindow } from './components/PreviewWindow';
-import { Login } from './components/Login';
-import { ImageData, CollageSettings, AuthCredentials } from './types';
+import { ImageData, CollageSettings } from './types';
 import { extractTheme } from './utils/themeExtractor';
 
 const theme = createTheme({
@@ -26,9 +25,6 @@ const theme = createTheme({
     }
   }
 });
-
-const VALID_USERNAME = 'mouge';
-const VALID_PASSWORD = 'jadoreFLU><!';
 
 const DropZone = styled(Box)(({ theme }) => ({
   border: `2px dashed ${theme.palette.primary.main}`,
@@ -63,8 +59,6 @@ const ImageThumbnail = styled(Box)({
 });
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [authError, setAuthError] = useState<string>();
   const [images, setImages] = useState<ImageData[]>([]);
   const [settings, setSettings] = useState<CollageSettings>({
     width: 1024,
@@ -73,15 +67,6 @@ function App() {
     showThemes: false
   });
   const [themes, setThemes] = useState<string[][]>([]);
-
-  const handleLogin = (credentials: AuthCredentials) => {
-    if (credentials.username === VALID_USERNAME && credentials.password === VALID_PASSWORD) {
-      setIsAuthenticated(true);
-      setAuthError(undefined);
-    } else {
-      setAuthError('Invalid username or password');
-    }
-  };
 
   useEffect(() => {
     if (settings.showThemes) {
@@ -149,78 +134,72 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        {!isAuthenticated ? (
-          <Login onLogin={handleLogin} error={authError} />
-        ) : (
-          <>
-            <Typography variant="h3" gutterBottom>
-              Isulion Collage Creator
-            </Typography>
+        <Typography variant="h3" gutterBottom>
+          Isulion Collage Creator
+        </Typography>
 
-            <PreviewWindow
-              images={images}
-              settings={settings}
-              onSettingsChange={setSettings}
-              onImagesChange={setImages}
+        <PreviewWindow
+          images={images}
+          settings={settings}
+          onSettingsChange={setSettings}
+          onImagesChange={setImages}
+        />
+
+        <Box sx={{ mt: 4 }}>
+          <DropZone
+            onDrop={handleDrop}
+            onDragOver={preventDefault}
+            onDragEnter={preventDefault}
+          >
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleFileSelect}
+              id="file-input"
             />
+            <label htmlFor="file-input">
+              <Button variant="contained" component="span">
+                Choose Images
+              </Button>
+            </label>
+            <Typography sx={{ mt: 2 }}>
+              or drag and drop images here
+            </Typography>
+          </DropZone>
 
-            <Box sx={{ mt: 4 }}>
-              <DropZone
-                onDrop={handleDrop}
-                onDragOver={preventDefault}
-                onDragEnter={preventDefault}
-              >
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  onChange={handleFileSelect}
-                  id="file-input"
+          <ImageList>
+            {images.map((img, index) => (
+              <ImageThumbnail key={index}>
+                <img
+                  src={URL.createObjectURL(img.image)}
+                  alt={img.title}
                 />
-                <label htmlFor="file-input">
-                  <Button variant="contained" component="span">
-                    Choose Images
-                  </Button>
-                </label>
-                <Typography sx={{ mt: 2 }}>
-                  or drag and drop images here
-                </Typography>
-              </DropZone>
-
-              <ImageList>
-                {images.map((img, index) => (
-                  <ImageThumbnail key={index}>
-                    <img
-                      src={URL.createObjectURL(img.image)}
-                      alt={img.title}
-                    />
-                    {settings.showThemes && themes[index] && themes[index].length > 0 && (
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          position: 'absolute',
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                          color: 'white',
-                          padding: '4px',
-                          textAlign: 'center',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap'
-                        }}
-                      >
-                        {themes[index].join(', ')}
-                      </Typography>
-                    )}
-                  </ImageThumbnail>
-                ))}
-              </ImageList>
-            </Box>
-          </>
-        )}
+                {settings.showThemes && themes[index] && themes[index].length > 0 && (
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                      color: 'white',
+                      padding: '4px',
+                      textAlign: 'center',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {themes[index].join(', ')}
+                  </Typography>
+                )}
+              </ImageThumbnail>
+            ))}
+          </ImageList>
+        </Box>
       </Container>
     </ThemeProvider>
   );
