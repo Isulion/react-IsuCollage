@@ -109,7 +109,7 @@ export const PreviewWindow: React.FC<PreviewProps> = ({
           {preview ? (
             <img src={preview} alt="Collage preview" />
           ) : (
-            <Typography color="text.secondary">
+            <Typography color="text.secondary" onClick={() => document.getElementById('file-input')?.click()}>
               Add images to see preview
             </Typography>
           )}

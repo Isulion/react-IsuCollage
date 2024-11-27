@@ -164,8 +164,8 @@ function App() {
                 Choose Images
               </Button>
             </label>
-            <Typography sx={{ mt: 2 }}>
-              or drag and drop images here
+            <Typography sx={{ mt: 2 }} onClick={() => document.getElementById('file-input')?.click()}>
+              Add images to see preview
             </Typography>
           </DropZone>
 
